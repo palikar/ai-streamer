@@ -21,6 +21,8 @@ class Argumenter:
         self.data = False
         self.logging = False
         self.model_loader = False
+        self.list_files = None
+        self.arr_files = None
         
         self.parser = argparse.ArgumentParser(
             prog="name",
@@ -55,17 +57,18 @@ class Argumenter:
     def add_split_data(self):
         self.data = True
         self.parser.add_argument('-te', '--test', dest='test',action="store",
-                                 required=False,
+                                 required=False, default=None,
                                  help='The data to test \
                                  the final model')
 
         self.parser.add_argument('-tr', '--train', dest='train',action="store",
-                                 required=False,
+                                 required=False, default=None,
                                  help='The data to train \
                                  the model with')
 
         self.parser.add_argument('-v','--validate', dest='validate',
                                  action="store", required=False,
+                                 default=None,
                                  help='The data to use for \
                                  validation while training.')
         
@@ -74,7 +77,8 @@ class Argumenter:
     def add_common_data(self):
         self.data = True
         self.parser.add_argument('--data', dest='data', action="store",
-                                 required=False, help='A single direcotry or \
+                                 required=False, default=None,
+                                 help='A single direcotry or \
                                  something to load data from. Split\
                                  will be performed later')
 
@@ -82,17 +86,20 @@ class Argumenter:
     def _simple_model_loader(self):
         self.parser.add_argument('-m', '--model', dest='model_file',
                                  action="store", required=False,
+                                 default=None,
                                  help='File to load the model from.')
 
         self.parser.add_argument('-w', '--weights', dest='weights_file',
                                  action="store", required=False,
+                                 default=None,
                                  help='File to load the model weights from.')
 
     def _dir_model_loader(self):
         self.parser.add_argument('-md', '--model-dir', dest='model_dir',
-                                     action="store", required=False,
-                                     help='Direcotry for loading\
-                                     model and weights')
+                                 action="store", required=False,
+                                 default=None,
+                                 help='Direcotry for loading\
+                                 model and weights')
         
         
         
@@ -112,7 +119,7 @@ class Argumenter:
             list_help_string += " - " + list_file + ' \n'
         
         self.parser.add_argument('-l', '--list_files', dest='lists', nargs='+',
-                                 action="store", required=False,
+                                 action="store", required=False, default=None,
                                  help='File to load the flowing lists:\n \
                                  {list_help_string}.\n \
                                  The argument must be given in the the of list\
@@ -125,7 +132,7 @@ class Argumenter:
             list_help_string += " - " + arr + ' \n'
         
         self.parser.add_argument('-a', '--array_files', dest='arrs', nargs='+',
-                                 action="store", required=False,
+                                 action="store", required=False, default=None,
                                  help='File to load the flowing arrays:\n \
                                  {list_help_string}.\n \
                                  The argument must be given in the the of list\
@@ -191,20 +198,32 @@ class Argumenter:
 
     def validate(self, args):
 
-        if (args.data is None and args.train is None
-            and args.no_train is False):
-            print("You must either specify --data or --train \
-            when training a model")
-            exit(1)
+        if hasattr(args, 'data'): 
+            if (args.data is None and args.no_train is False):
+                print("You must either specify --data \
+                when training a model")
+                exit(1)
 
-        if (args.data is None and args.test is None and
-            args.no_eval is False):
-            print("You must either specify --data or --test \
-            when evaluating a model")
-            exit(1)
+            if (args.data is None and args.no_eval is False):
+                print("You must either specify --data \
+                when evaluating a model")
+                exit(1)
+        else:
+            if (args.test is None and
+                args.no_eval is False):
+                print("You must specify --test \
+                when evaluating a model")
+                exit(1)
 
+            if (args.train is None and
+                args.no_train is False):
+                print("You must specify --train \
+                when evaluating a model")
+                exit(1)
+
+                
         if (args.model_file is not None and args.weights_file is None
-            and args.model_dir):
+            and args.model_dir is None):
             print("You've specified model file to load bu no weights are given.")
             exit(1)
 
@@ -218,9 +237,29 @@ class Argumenter:
 
         files, directories, either = list(), list(), list()
 
+
+        if self.list_files is not None:
+            files = files + self.list_files[1::2]
+            
+        if self.arr_files is not None:
+            files = files + self.arr_files[1::2]
+
+        if hasattr(args, 'data'):
+            if args.data is not None: either.append(args.data)
+        else:
+            if args.train is not None: either.append(args.train)
+            if args.test is not None: either.append(args.test)
+            if args.validate is not None: either.append(args.validate)
+
+        if hasattr(args, 'model_dir'):
+            if args.model_dir is not None: directories.append(args.model_dir)
+        else:
+            if args.config is not None: files.append(args.config)
+            if args.weights_file is not None: files.append(args.weights_file)
+            if args.model_file is not None: files.append(args.model_file)
+
+            
         
-
-
 
         return (files, directories, either)
         
@@ -234,7 +273,6 @@ def main():
     ar.init("MLawesome")
     ar.build()
     ar.parse(sys.argv)
-    pass
     
         
 if __name__ == '__main__':
