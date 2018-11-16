@@ -28,7 +28,7 @@ setup(
     include_package_data=True,
     author="Stanislav Arnaudov",
     author_email="stanislv_ts@abv.bg",
-    description=" ",
+    description="Streamlining utility for building my ML models",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
