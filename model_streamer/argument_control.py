@@ -118,20 +118,20 @@ class Argumenter:
         for list_file in list_files:
             list_help_string += " - " + list_file + ' \n'
         
-        self.parser.add_argument('-l', '--list_files', dest='lists', nargs='+',
+        self.parser.add_argument('-l', '--list-files', dest='lists', nargs='+',
                                  action="store", required=False, default=None,
-                                 help='File to load the flowing lists:\n \
+                                 help=f'File to load the flowing lists:\n\
                                  {list_help_string}.\n \
                                  The argument must be given in the the of list\
                                  of parts of the form [< <list> <file> > ...]')
     
     def add_array_files(self, array_files):
         list_help_string = ""
-        self.arr_files = arr_files
+        self.arr_files = array_files
         for arr in array_files:
             list_help_string += " - " + arr + ' \n'
         
-        self.parser.add_argument('-a', '--array_files', dest='arrs', nargs='+',
+        self.parser.add_argument('-a', '--array-files', dest='arrs', nargs='+',
                                  action="store", required=False, default=None,
                                  help='File to load the flowing arrays:\n \
                                  {list_help_string}.\n \
@@ -200,13 +200,13 @@ class Argumenter:
 
         if hasattr(args, 'data'): 
             if (args.data is None and args.no_train is False):
-                print("You must either specify --data \
-                when training a model")
+                print("You must specify --data \
+when training a model")
                 exit(1)
 
             if (args.data is None and args.no_eval is False):
-                print("You must either specify --data \
-                when evaluating a model")
+                print("You must specify --data\
+when evaluating a model")
                 exit(1)
         else:
             if (args.test is None and
@@ -228,10 +228,28 @@ class Argumenter:
             exit(1)
 
         if self.list_files is not None:
-            self._check_list(args.lists)
+            if args.lists is None:
+                print('List files are not specified!')
+                exit(1)
+            self._check_list(args.lists, self.list_files, "lists")
 
+        # if self.arr_files is not None:
+        #     self._check_list(args.arrs, self.arr_files, "arrays")
+
+
+
+    def get_lists(self, args):
+
+        lists = None
+        arrs = None
+        
+        if self.list_files is not None:
+            lists = zip(args.lists[0::2], args.lists[1::2])
         if self.arr_files is not None:
-            self._check_list(args.arrs)
+            arrs = zip(args.arrs[0::2], args.arrs[1::2])
+            
+        return (lists, arrs)
+
 
     def get_resources(self, args):
 
@@ -239,10 +257,10 @@ class Argumenter:
 
 
         if self.list_files is not None:
-            files = files + self.list_files[1::2]
+            files = files + args.lists[1::2]
             
         if self.arr_files is not None:
-            files = files + self.arr_files[1::2]
+            files = files + args.arrs[1::2]
 
         if hasattr(args, 'data'):
             if args.data is not None: either.append(args.data)

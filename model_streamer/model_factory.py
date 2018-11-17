@@ -28,7 +28,7 @@ class KerasSequential:
     def configure(self, config):
         self.config = config
     def __call__(self, params):
-        print("Creating keras")
+        print("Creating kerasdddd")
         return "This is not kerase"
 
 ModelFactory.register_model('keras_sequential', KerasSequential())
