@@ -221,12 +221,13 @@ when evaluating a model")
                 when evaluating a model")
                 exit(1)
 
-                
-        if (args.model_file is not None and args.weights_file is None
-            and args.model_dir is None):
+        if (hasattr(args, 'model_file') 
+            and args.model_file is None and args.weights_file is None):
             print("You've specified model file to load bu no weights are given.")
             exit(1)
-
+            
+            
+        
         if self.list_files is not None:
             if args.lists is None:
                 print('List files are not specified!')
