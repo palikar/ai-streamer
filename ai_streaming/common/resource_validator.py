@@ -1,7 +1,7 @@
 import os
-from utils import assert_dir
-from utils import assert_file
-from utils import is_file_or_dir
+from .utils import assert_dir
+from .utils import assert_file
+from .utils import is_file_or_dir
 
 
 class ResourceValidator:

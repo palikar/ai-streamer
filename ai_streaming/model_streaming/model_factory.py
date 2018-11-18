@@ -1,10 +1,13 @@
-
-
 ###############################################
 #########    Management Factory   #############
 ###############################################
 
 class ModelFactory(object):
+    """A factory class for managing the model loaders and builder.
+Loaders and builders can be registered and then they can get used
+ by the with_model_loader or with_model_builder  decorators.
+    
+    """
     models = dict()
     loaders = dict()
 
@@ -39,7 +42,7 @@ class ModelFactory(object):
 
 class KerasSequential:
     def __call__(self, params):
-        return "This is not kerase"
+        return "This is keras"
 
 class KerasSequentialLoader:
     def __call__(self,files, params):
@@ -49,7 +52,7 @@ class KerasSequentialLoader:
         else:
             pass
 
-        return "This is not kerase but from file"
+        return "This is keras from files"
 
 ModelFactory.register_model('keras_sequential', KerasSequential())
 ModelFactory.register_loader('keras_sequential', KerasSequentialLoader())
