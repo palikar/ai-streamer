@@ -60,12 +60,10 @@ class Argumenter:
                                  required=False, default=None,
                                  help='The data to test \
                                  the final model')
-
         self.parser.add_argument('-tr', '--train', dest='train',action="store",
                                  required=False, default=None,
                                  help='The data to train \
                                  the model with')
-
         self.parser.add_argument('-v','--validate', dest='validate',
                                  action="store", required=False,
                                  default=None,

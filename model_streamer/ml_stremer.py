@@ -78,14 +78,27 @@ class MLStreamer:
     def model_setup(self, config):#should be model_build!
         "Documentation."
 
-    
+        
     @abstractclassmethod
-    def model_load(self, files):
+    def model_load(self, config, files):
         "Documentation."
 
         
     @abstractclassmethod
-    def load_data(self, files):
+    def load_data(self, config, files):
+        "Documentation."
+
+
+    @abstractclassmethod
+    def train_model(self, config, data, model, pipeline):
+        "Documentation."
+
+    @abstractclassmethod
+    def pipeline(self, config):
+        "Documentation."
+
+    @abstractclassmethod
+    def eval_model(self, config, data, model, pipeline):
         "Documentation."
     
 
@@ -141,12 +154,26 @@ class MLStreamer:
             model = self.model_setup(self.config)
 
         assert model is not None, 'The model was not build corecctly!'
-        
 
-        
-        #Load the data
 
+        pipeline = self.pipeline(self.config)
+        assert isinstance(pipeline, dict), "The pipline object must be a dictionary!"
         
+        if not args.no_train:
+            #Load the data
+            data = None
+            if hasattr(args, 'data'):
+                data = self.load_data(self.config, args.data)
+            else:
+                self.load_data(self, self.config, (args.test, args.validate, args.train))
+            assert data is not None, "The data was not properly loaded!"
+            #Train model
+            self.train_model(self.config, data, model, pipeline)
+
+
+
+        if not args.no_eval:
+            self.eval_model(self.config, data, model, pipeline)
 
         
         
@@ -161,21 +188,44 @@ class TestModel(MLStreamer):
          MLStreamer.__init__(self)
         
 
-     
     def arg_setup(self, argumentar):
-        argumentar.add_model_loader(directory=False)
+        argumentar.add_model_loader(directory=True)
         
 
     @MLStreamer.with_model_builder(model='keras_sequential')
-    def model_setup(self, config, keras):
-        
+    def model_setup(self, config, keras):        
         return keras
 
 
     @MLStreamer.with_model_loader(model='keras_sequential')
     def model_load(self, files, keras):
-        
+        print(f'{keras} loaded')
         return keras
+
+
+    @abstractclassmethod
+    def load_data(self, config, files):
+        print(f'loading data from {files}')
+        return "data_stuff"
+
+    
+    @abstractclassmethod
+    def pipeline(self, config):
+        print('Doing random shit')
+        return dict({"no":"yes"})
+
+    
+    @abstractclassmethod
+    def train_model(self, config, data, model, pipeline):
+        print(f'training {model} with {data}')
+        pass
+
+    
+    @abstractclassmethod
+    def eval_model(self, config, data, model, pipeline):
+        print(f'eval {model} with {data} and {pipeline}')
+        pass
+        
         
 
 
