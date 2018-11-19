@@ -1,0 +1,49 @@
+
+# #+OPTIONS: ':t *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline author:t
+# #+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK")
+# #+OPTIONS: date:t e:t email:nil f:t inline:t num:t p:nil pri:nil
+# #+OPTIONS: prop:nil stat:t tags:t tasks:t tex:t timestamp:t title:t
+
+#+OPTIONS: toc:nil todo:t |:t
+
+#+TITLE: README
+#+DATE: <2018-11-19 Mon>
+#+AUTHOR: Stanislav Arnaudov
+#+EMAIL: arnaud@localhost
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 26.1 (Org mode 9.1.13)
+
+
+
+* AIStreamer
+AIStreamer is my personal library/framework for streamlining the process of writing and deploying scripts for machine learning models, image processing and generally "AI stuff". Hence /AIStream(lin)er/.
+
+** Abstract
+So at some point, I came up with the idea to write a simple framework that should abstract away the boilerplate code and allow to actually write the interesting parts of the scripts/applications without me every time worrying about how everything should come together.
+
+*** Design goals 
+
+- Flexibility - The framework should not limit what I can write. I should be able to write every model that I can write from scratch using [[https://www.tensorflow.org/%0A%0A][Tensorflow]], [[https://keras.io/][Keras]], [[https://opencv.org/][Opencv]] and what have you.
+- Extendability - adding new features should not require any substantial rewrites of the core components. The architecture should allow "hot swappable" components.
+- Sort of simple to use (at least when following the documentation). (This nicely ties up to the next point.)
+- Good documentation and clear architecture so that I can "relearn" everything with relative ease.
+
+
+** Installation
+
+
+
+** Documentation  
+
+
+** Examples
+
+
+
+
+
+
+
+#  LocalWords:  AIStreamer
