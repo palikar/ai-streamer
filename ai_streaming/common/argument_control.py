@@ -131,7 +131,7 @@ class Argumenter:
 
 
     def _addative_logging(self):
-        self.parser.add_argument('--logging', '-l', action='count', default=0,
+        self.parser.add_argument('--log', '-l', action='count', default=0,
                                  help='Logging level.')
 
         self.parser.add_argument('--silent', '-q', action='store_true',
@@ -139,7 +139,7 @@ class Argumenter:
  
         
     def add_logging(self, simple=True):
-        self.logging = true
+        self.logging = True
         if simple:
             self._simple_logging()
         else:
@@ -169,12 +169,14 @@ class Argumenter:
         if len(l) == 0 and len(files) != 0:
             print(f'{name} is empty but is should\'t be')
 
+        # print(files)
         for f in files:
             if f not in l:
                 print(f'{f} is not in the {name}')
                 exit(1)
             index = l.index(f)
-            if l[index+1] in files:
+            
+            if index+1 >= len(l) or (index+1 < len(l) and l[index+1] in files):
                 print('Something is wrong with {name}')
                 exit(1)
         
@@ -238,9 +240,11 @@ when evaluating a model")
 
         files, directories, either = list(), list(), list()
 
-
+        files.append(args.config)
+        
         if self.list_files is not None:
             files = files + args.lists[1::2]
+            print(files)
             
         if self.arr_files is not None:
             files = files + args.arrs[1::2]
@@ -259,4 +263,5 @@ when evaluating a model")
             if args.weights_file is not None: files.append(args.weights_file)
             if args.model_file is not None: files.append(args.model_file)
 
-            return (files, directories, either)
+    
+        return (files, directories, either)
