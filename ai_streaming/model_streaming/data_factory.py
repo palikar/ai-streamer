@@ -29,6 +29,21 @@ keywords arguments passed to the with_pipeline_stage decorator.
         DataFactory.loaders[name] = loader
 
 
+class FileLoaderFactory(object):
+
+    file_loaders = dict()
+
+
+    @staticmethod
+    def set_loader(cl, name, loader):
+        FileLoaderFactory.file_loaders[name] = loader
+
+    @staticmethod
+    def get_loader(cl, name):
+        return file_loaders[name]
+        
+
+
 ###############################################
 ###############################################
 ###############################################

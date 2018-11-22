@@ -13,8 +13,7 @@ class Argumenter:
         self.data = False
         self.logging = False
         self.model_loader = False
-        self.list_files = None
-        self.arr_files = None
+        self.custom_files = None
 
         self.parser = argparse.ArgumentParser(
             prog="name",
@@ -42,6 +41,9 @@ class Argumenter:
                                  action="store", required=True,
                                  help='Configuration file (config.json)')
 
+    def get_parse_obj(self):
+        return self.pareser
+
 
     def add_split_data(self):
         self.data = True
@@ -67,7 +69,6 @@ class Argumenter:
                                  help='A single direcotry or \
                                  something to load data from. Split\
                                  will be performed later')
-
 
     def _simple_model_loader(self):
         self.parser.add_argument('-m', '--model', dest='model_file',
@@ -95,33 +96,18 @@ class Argumenter:
             self._dir_model_loader()
             
         
-    def add_list_files(self, list_files):
+    def add_custom_files(self, custom_files):
         list_help_string = ""
-        self.list_files = list_files
-        for list_file in list_files:
-            list_help_string += " - " + list_file + ' \n'
+        self.custom_files = custom_files
+        for file in custom_files:
+            list_help_string += " - " + file + ' \n'
         
-        self.parser.add_argument('-l', '--list-files', dest='lists', nargs='+',
+        self.parser.add_argument('-f', '--files', dest='custom_files', nargs='+',
                                  action="store", required=False, default=None,
-                                 help=f'File to load the flowing lists:\n\
+                                 help=f'File to be loaded:\n\
                                  {list_help_string}.\n \
-                                 The argument must be given in the the of list\
-                                 of parts of the form [< <list> <file> > ...]')
-    
-
-    def add_array_files(self, array_files):
-        list_help_string = ""
-        self.arr_files = array_files
-        for arr in array_files:
-            list_help_string += " - " + arr + ' \n'
-        
-        self.parser.add_argument('-a', '--array-files', dest='arrs', nargs='+',
-                                 action="store", required=False, default=None,
-                                 help='File to load the flowing arrays:\n \
-                                 {list_help_string}.\n \
-                                 The argument must be given in the the of list\
-                                 of parts of the form [< <list> <file> > ...]')
-
+                                 The argument must be given in the form of a list\
+                                 of parts of the form [< <name> <file> > ...]')
 
     def _simple_logging(self):
         self.parser.add_argument('--log', dest='log',
@@ -210,31 +196,18 @@ when evaluating a model")
             print("You've specified model file to load but no weights are given.")
             exit(1)
 
-        if self.list_files is not None:
-            if args.lists is None:
-                print('List files are not specified!')
+        if self.custom_files is not None:
+            if args.custom_files is None:
+                print('Files are not specified!')
                 exit(1)
-            self._check_list(args.lists, self.list_files, "lists")
-
-        if self.arr_files is not None:
-            if args.lists is None:
-                print('Array files are not specified!')
-                exit(1)
-            self._check_list(args.arrs, self.arr_files, "arrays")
+            self._check_list(args.custom_files, self.custom_files, "files")
 
 
-    def get_lists(self, args):
-
-        lists = None
-        arrs = None
-        
-        if self.list_files is not None:
-            lists = zip(args.lists[0::2], args.lists[1::2])
-        if self.arr_files is not None:
-            arrs = zip(args.arrs[0::2], args.arrs[1::2])
-            
-        return (lists, arrs)
-
+    def get_custom_files(self, args):        
+        files = None
+        if self.custom_files is not None:
+            files = zip(args.custom_files[0::2], args.custom_files[1::2])            
+        return files
 
     def get_resources(self, args):
 
@@ -242,13 +215,9 @@ when evaluating a model")
 
         files.append(args.config)
         
-        if self.list_files is not None:
-            files = files + args.lists[1::2]
-            print(files)
-            
-        if self.arr_files is not None:
-            files = files + args.arrs[1::2]
-
+        if self.custom_files is not None:
+            files = files + args.custom_files[1::2]
+                        
         if hasattr(args, 'data'):
             if args.data is not None: either.append(args.data)
         else:
@@ -259,9 +228,11 @@ when evaluating a model")
         if hasattr(args, 'model_dir'):
             if args.model_dir is not None: directories.append(args.model_dir)
         else:
-            if args.config is not None: files.append(args.config)
+            if args.model_file != -1: files.append(args.model_file)
             if args.weights_file is not None: files.append(args.weights_file)
-            if args.model_file is not None: files.append(args.model_file)
 
     
         return (files, directories, either)
+
+        
+        

@@ -20,7 +20,7 @@ if sys.version_info < (3, 3):
     sys.exit(1)
 
 
-exec(open('model_streamer/version.py').read())
+exec(open('ai_streaming/version.py').read())
 
 setup(
     name="model_streamer",

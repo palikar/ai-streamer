@@ -12,7 +12,7 @@ from ..common.argument_control import Argumenter
 from ..common.resource_validator import ResourceValidator
 
 
-class MLStreamer(ABCMeta):
+class MLStreamer():
     """ An abstract base class that defines the skeleton of a process of
 building a model, loading train/validate/test data and training the built model.
 
@@ -40,6 +40,8 @@ The abstract methods can be decorated with the decorators in decorators.py.
         self.config = None
         self.lists = dict()
         self.arrays = dict()
+        self.custom_files = dict()
+        self.loader = dict()
 
 
     def get_config(self):
@@ -52,55 +54,29 @@ The abstract methods can be decorated with the decorators in decorators.py.
         
         return self.config
 
-    def get_lists(self):
-        """Retrieve all of the available list files
+    
+    def get_custom_files(self):
+        """Retrieve all of the loaded files
 
-        :returns: A dictionary of the loaded list files. 
-<list file name> -> <list contents>
-        :rtype: dict
-        """
-        
-        return self.lists
-
-    def get_arrays(self):
-        """Retrieve all of the loaded array files
-
-        :returns: A dictionary of the loaded array files. 
+        :returns: A dictionary of the loaded files. 
 <array file name> -> <numpy array>
-        :rtype: dict
+        :rtype: dict 
         
         """
-        return self.arrays
+        return self.custom_files
 
     
-    def get_list(self, name):
-        """Retrieve the contents of a list file.
+    def get_custom_file(self, name):
+        """Retrieve the object loader form a file.
 
-        :param name: The name of the list file which contents are to be returned
-        :returns: The contents of the list file in the form of a list.
-        :rtype: list
-
-        """
-        
-        if name not in self.lists.keys():
-            print(f'{name} is not a list')
-            exit(1)
-        return self.lists[name]
-
-    def get_array(self, name):
-        """Retrieve the contents of an array file.
-
-        :param name: The name of the array file which 
+        :param name: The name of the file which 
 contents are to be returned.
         :returns: The contents of the array file in the form of a numpy array.
         :rtype: numpy.ndarray
-
-        
         """
-        if name not in self.arrays.keys():
-            print(f'{name} is not a array')
-            exit(1)
-        return self.arrays[name]
+        #TODO: make chechek here
+        return self.custom_files[name]
+
         
 
     @abstractclassmethod
@@ -108,6 +84,10 @@ contents are to be returned.
         pass
 
 
+    @abstractclassmethod
+    def file_loader_setup(self, loader, config):
+        pass
+    
     @abstractclassmethod
     def model_setup(self, config):#should be model_build!
         pass
@@ -170,30 +150,27 @@ called in the appropriate places but the boilerplate code is abstracted away.
         extension = os.path.splitext(config_file_path)[1]
         if extension == ".json":
             self.config = json.load(open(config_file_path, 'r'))
-        assert self.config is not None, 'The configuration
-\file was not read properly!'
-            
+        assert self.config is not None, 'The configuration\
+file was not read properly!'
 
+
+        self.file_loader_setup(self.loader, self.config)
+        assert self.loader is not None, "The file loader was not properly setup"
+        
         # Load lists
-        lists, arrs = self.argumentar.get_lists(args)
-        if lists is not None:
-            for list_name, list_path in lists:
-                list_path = os.path.abspath(list_path)
-                with open(list_path, 'r') as file:
-                    self.lists[list_name] =  file.read().splitlines()
-        if arrs is not None:
-            for arr_name, arr_path in arrs:
-                arr_path = os.path.abspath(arr_path)
-                try:
-                    self.arrays[arr_name] = np.loadtxt(arr_path)
-                except ValueError:
-                    print(f'Could not load array file\
-\'{arr_path}\' for array \'{arr_name}\'')
+        custom_files = self.argumentar.get_custom_files(args)
+        if custom_files is not None:
+            for file_name, file_path in custom_files:
+                file_path = os.path.abspath(file_path)
+                if file_name not in self.loader.keys():
+                    print(f'No loader for file \'{file_name}\'')
                     exit(1)
+                self.custom_files[file_name] = self.loader[file_name](file_path)
+
 
         # #Building the user defined model        
         model = None
-        if  hasattr(args, 'model_file') and args.model_file is not None:
+        if  hasattr(args, 'model_file') and args.model_file != -1:
             model = self.model_load((args.model_file, args.weights_file))
         elif hasattr(args, 'model_dir') and args.model_dir is not None:
             model = self.model_load(args.model_dir)
@@ -213,8 +190,8 @@ called in the appropriate places but the boilerplate code is abstracted away.
             if hasattr(args, 'data'):
                 data = self.load_data(self.config, args.data)
             else:
-                self.load_data(self, self.config,
-                               (args.test, args.validate, args.train))
+                data = self.load_data(self.config,
+                               (args.train, args.validate, args.test))
             assert data is not None, "The data was not properly loaded!"
             #Train model
             self.train_model(self.config, data, model, pipeline)
@@ -224,4 +201,4 @@ called in the appropriate places but the boilerplate code is abstracted away.
         if not args.no_eval:
             self.eval_model(self.config, data, model, pipeline)
 
-        self.save_model(self.config, model)
+        self.save_model(self.config, model, args.ouput)
