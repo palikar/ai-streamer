@@ -56,4 +56,42 @@ class KerasSequentialLoader:
 
 ModelFactory.register_model('keras_sequential', KerasSequential())
 ModelFactory.register_loader('keras_sequential', KerasSequentialLoader())
-    
+
+
+###############################################
+###############################################
+
+class ScikitDecisionTreeClassificator:
+
+    def __call__(self, params):
+        from sklearn.tree import DecisionTreeClassifier
+        config = params['config'] if 'config' in params.keys() else dict()
+        print(config)
+        tree = DecisionTreeClassifier(**config)
+        return tree
+        
+        
+class ScikitDecisionTreeClassificatorLoader:
+
+    def __call__(self,files, params):
+        
+        if isinstance(files, tuple):
+            model, weights = files
+            
+        else:
+            model_dir = files
+
+        
+
+
+                
+
+ModelFactory.register_model('scikit_tree_classifier', ScikitDecisionTreeClassificator())
+ModelFactory.register_loader('scikit_tree_classifier', ScikitDecisionTreeClassificatorLoader())
+
+###############################################
+###############################################
+
+
+
+

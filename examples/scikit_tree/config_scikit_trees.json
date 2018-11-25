@@ -4,7 +4,7 @@
     "test_columns": ["PassengerId","Pclass", "Fare","Sex", "Age","SibSp","Parch","Fare","Embarked"],
     "predict": "Survived",
     "tree":{
-        "crit" : "gini"
+        "criterion" : "gini"
     }
     
 }

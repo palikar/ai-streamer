@@ -4,7 +4,7 @@ from .data_factory import DataFactory
 
 
 
-def with_model_builder(model=None, **kwargs):
+def with_model_builder(model, **kwargs):
     """Used to decoreate the MLStreamer.model_setup method. Allows the injection
 
 of different predifined models into the method.
@@ -14,6 +14,9 @@ of different predifined models into the method.
     """
     def decorator(fun):
         def wrapper(self, config):
+            if 'config' in kwargs.keys():
+                node = kwargs['config']
+                kwargs['config'] = self.get_config()[node]
             model_obj = ModelFactory.get_model(model, kwargs)
             return fun(self, config, model_obj)
         return wrapper
@@ -28,7 +31,7 @@ loading of models with the help of predefined loaders.
     :rtype: 
     """
     def decorator(fun):
-        def wrapper(self, files):
+        def wrapper(self, files):            
             model_obj = ModelFactory.load_model(model, files, kwargs)
             return fun(self,files, model_obj)
         return wrapper

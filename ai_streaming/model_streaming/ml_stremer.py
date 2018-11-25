@@ -10,6 +10,7 @@ from abc import ABCMeta
 
 from ..common.argument_control import Argumenter
 from ..common.resource_validator import ResourceValidator
+from ..common.resource_dumper import Dumper
 
 
 class MLStreamer():
@@ -42,6 +43,7 @@ The abstract methods can be decorated with the decorators in decorators.py.
         self.arrays = dict()
         self.custom_files = dict()
         self.loader = dict()
+        self.dumper = None
 
 
     def get_config(self):
@@ -76,6 +78,11 @@ contents are to be returned.
         """
         #TODO: make chechek here
         return self.custom_files[name]
+
+    
+    def get_dumper(self):
+        return self.dumper
+        
 
         
 
@@ -144,6 +151,11 @@ called in the appropriate places but the boilerplate code is abstracted away.
         (files, dirs, either) = self.argumentar.get_resources(args)
         self.resource_validation.assert_resources(files, dirs, either)
 
+        
+        if not os.path.isdir(args.output):
+            os.makedirs(args.output)
+        self.dumper = Dumper(args.output)
+
 
         #Configuration loading
         config_file_path = os.path.abspath(args.config)
@@ -166,7 +178,6 @@ file was not read properly!'
                     print(f'No loader for file \'{file_name}\'')
                     exit(1)
                 self.custom_files[file_name] = self.loader[file_name](file_path)
-
 
         # #Building the user defined model        
         model = None
@@ -201,4 +212,4 @@ file was not read properly!'
         if not args.no_eval:
             self.eval_model(self.config, data, model, pipeline)
 
-        self.save_model(self.config, model, args.ouput)
+        self.save_model(self.config, model, args.output)

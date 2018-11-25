@@ -31,7 +31,7 @@ class Argumenter:
                                  default=False,
                                  help='Should the model be evaluated.')
 
-        self.parser.add_argument('-o', '--ouput', dest='ouput',
+        self.parser.add_argument('-o', '--output', dest='output',
                                  action="store", required=False,
                                  default=f'./{name}_res',
                                  help='Where the should be the results\
