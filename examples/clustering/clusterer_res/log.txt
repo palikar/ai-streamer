@@ -1,5 +1,0 @@
-+----------------Log file---------------------+
-|There should be some usefull information here|
-+---------------------------------------------+
-
-

@@ -66,7 +66,6 @@ class ScikitDecisionTreeClassificator:
     def __call__(self, params):
         from sklearn.tree import DecisionTreeClassifier
         config = params['config'] if 'config' in params.keys() else dict()
-        print(config)
         tree = DecisionTreeClassifier(**config)
         return tree
         
@@ -80,10 +79,6 @@ class ScikitDecisionTreeClassificatorLoader:
             
         else:
             model_dir = files
-
-        
-
-
                 
 
 ModelFactory.register_model('scikit_tree_classifier', ScikitDecisionTreeClassificator())
@@ -92,6 +87,32 @@ ModelFactory.register_loader('scikit_tree_classifier', ScikitDecisionTreeClassif
 ###############################################
 ###############################################
 
+class ScikitGmm:
+
+    def __call__(self, params):
+        from sklearn.mixture import GaussianMixture
+        config = params['config'] if 'config' in params.keys() else dict()
+        gmm = GaussianMixture(**config)
+        return gmm
+        
+        
+class ScikitGmmLoader:
+
+    def __call__(self,files, params):
+        
+        if isinstance(files, tuple):
+            model, weights = files
+            
+        else:
+            model_dir = files
+                
+
+ModelFactory.register_model('scikit_gmm', ScikitGmm())
+ModelFactory.register_loader('scikit_gmm', ScikitGmmLoader())
+
+
+###############################################
+###############################################
 
 
 
