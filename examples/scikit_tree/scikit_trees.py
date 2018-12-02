@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 import os
 import numpy as np
@@ -17,7 +18,7 @@ class TestModel(MLStreamer):
 
 
     def __init__(self):
-         MLStreamer.__init__(self)
+         MLStreamer.__init__(self, "scikit_trees")
          self.score = None
         
 

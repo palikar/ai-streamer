@@ -33,11 +33,11 @@ as:
 The abstract methods can be decorated with the decorators in decorators.py.
     """
 
-    def __init__(self):
+    def __init__(self, name):
         "docstring"
         self.argumentar =  Argumenter()
         self.resource_validation = ResourceValidator()
-        self.name = None
+        self.name = name
         self.config = None
         self.lists = dict()
         self.arrays = dict()
